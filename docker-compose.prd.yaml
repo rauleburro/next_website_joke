@@ -36,3 +36,8 @@ services:
       - VIRTUAL_HOST=bellbird.dev
       - LETSENCRYPT_HOST=bellbird.dev
     restart: always
+
+volumes:
+  nginx_certs:
+  nginx_vhosts:
+  nginx_html:
