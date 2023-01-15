@@ -1,0 +1,38 @@
+version: '3'
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - nginx_certs:/etc/nginx/certs:ro
+      - nginx_vhosts:/etc/nginx/vhost.d
+      - nginx_html:/usr/share/nginx/html
+    restart: always
+
+  nginx-proxy-letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: nginx-proxy-letsencrypt
+    environment:
+      - DEFAULT_EMAIL=rauleburro@gmail.com
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    depends_on:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nginx_certs:/etc/nginx/certs:rw
+    restart: always
+
+  web:
+    image: rauleburro/next_website_joke
+    container_name: web
+    ports:
+      - "3000:3000"
+    environment:
+      - VIRTUAL_PORT=3000
+      - VIRTUAL_HOST=bellbird.dev
+      - LETSENCRYPT_HOST=bellbird.dev
+    restart: always
